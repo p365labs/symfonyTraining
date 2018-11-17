@@ -1,0 +1,12 @@
+# This file is auto-generated during the composer install
+parameters:
+    database_host: doctrine_training_mysql
+    database_port: null
+    database_name: symfony_doctrine1
+    database_user: root
+    database_password: root
+    mailer_transport: smtp
+    mailer_host: 127.0.0.1
+    mailer_user: null
+    mailer_password: null
+    secret: eff7cda3271d0aec1392aab4c3a5c389e945ced7

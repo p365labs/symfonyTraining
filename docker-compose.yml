@@ -1,0 +1,46 @@
+version: '3'
+
+services:
+    symfony:
+        container_name: doctrine_training_php
+        build:
+            context: .
+            dockerfile: ./docker/php/Dockerfile
+        environment:
+            TIMEZONE: Europe/Rome
+        working_dir: /var/www/html
+        volumes:
+            - ./docker/php/php-linux.ini:/usr/local/etc/php/conf.d/php-linux.ini:ro
+            - ./docker/php/php-fpm-custom.conf:/usr/local/etc/php-fpm.d/z-php-fpm-custom.conf:ro
+            - .:/var/www/html:cached
+            #- ./var/cache:/var/www/html/var/cache:delegated
+            #- ./var/logs:/var/www/html/var/logs:delegated
+            #- ./var/sessions:/var/www/html/sessions:delegated
+            #- ./vendor:/var/www/html/vendor
+
+    nginx:
+        container_name: doctrine_training_nginx
+        image: nginx:1.15-alpine
+        environment:
+            - VIRTUAL_HOST=doctrine.training.ls
+            - HTTPS_METHOD=redirect
+        depends_on:
+            - symfony
+        volumes:
+            - ./docker/nginx/default_symfony.conf:/etc/nginx/conf.d/default.conf:ro
+            - ./docker/nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+            - .:/var/www/html
+        ports:
+          - "80:80"
+
+    mysql:
+        image: mysql:5.7.23
+        container_name: doctrine_training_mysql
+        volumes:
+            - ./storage/database:/var/lib/mysql:delegated
+            - ./docker/mysql/mycustom.cnf:/etc/mysql/conf.d/custom.cnf
+        environment:
+            - MYSQL_ROOT_PASSWORD=root
+            - MYSQL_DATABASE=root
+        ports:
+            - "3306:3306"
