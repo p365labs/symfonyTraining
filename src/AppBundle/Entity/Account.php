@@ -42,6 +42,9 @@ class Account
     public function __construct()
     {
         $this->type         = Account::ACCOUNT_TYPE_PRIVATE;
+        $this->tax_code     = "";
+        $this->contact      = new Contact();
+        $this->type         = false;
     }
 
     /**

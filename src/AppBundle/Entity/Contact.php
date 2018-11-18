@@ -49,7 +49,11 @@ class Contact
 
     public function __construct()
     {
-
+        $this->name     = "";
+        $this->surname  = "";
+        $this->phone    = "";
+        $this->address  = "";
+        
     }
 
     /**

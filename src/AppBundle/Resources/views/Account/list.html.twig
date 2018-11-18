@@ -1,0 +1,31 @@
+{% extends '@App/base.html.twig' %}
+
+        {% block content %}
+
+        <table class="table">
+            <thead>
+            <tr>
+                <th scope="col">#</th>
+                <th scope="col">Tipo</th>
+                <th scope="col">TaxCode</th>
+                <th scope="col">Name</th>
+                <th scope="col">Surname</th>
+                <th scope="col">Address</th>
+                <th scope="col">Phone</th>
+            </tr>
+            </thead>
+            <tbody>
+            {% for account in accounts %}
+                <tr>
+                    <th scope="row">{{ account.id }}</th>
+                    <td>{% if account.type == false%}PRIVATO{% else %}BUSINESS{% endif %}</td>
+                    <td>{{ account.tax_code }}</td>
+                    <td>{{ account.contact.name }}</td>
+                    <td>{{ account.contact.surname }}</td>
+                    <td>{{ account.contact.address }}</td>
+                    <td>{{ account.contact.phone }}</td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+        {% endblock %}

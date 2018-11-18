@@ -40,14 +40,12 @@ class AppKernel extends Kernel
 
     public function getCacheDir()
     {
-        return '/tmp/leadspark/cache/'.$this->getEnvironment();
-//        return dirname(__DIR__).'/var/cache/'.$this->getEnvironment();
+        return dirname(__DIR__).'/var/cache/'.$this->getEnvironment();
     }
 
     public function getLogDir()
     {
-        return '/tmp/leadspark/logs/doctrine_training';
-//        return dirname(__DIR__).'/var/logs';
+        return dirname(__DIR__).'/var/logs';
     }
 
     public function registerContainerConfiguration(LoaderInterface $loader)
