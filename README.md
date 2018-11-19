@@ -491,4 +491,224 @@ useful to se if something's broke and if your entities are valid doctrine entiti
 ``bin/console doctrine:schema:update --dump-sql``
 ``bin/console doctrine:schema:update --force``
 ``bin/console doctrine:schema:update --force``
+
+
+Play a bit with these commands in order to understand their meaning and how to execute them.
+
+###Doctrine Entities and Doctrine EntityManager
+
+Always remember to use the doctrine documentation, for a good starting point on it have a look it [here](https://www.doctrine-project.org/projects/doctrine-orm/en/2.6/tutorials/getting-started.html)
+
+When you need to work with the Entities and doctrine you need access to the EntityManager which
+is a Doctrine object responsible for the whole Entity lifecyle.
+
+To get the manager from Symfony get the manager from the container :
+``$this->get('doctrine')``
+
+Inside a Controller you can use :
+
+- $this->getDoctrine
+- $this->get('doctrine');
+
+the first is a shortcut to the second: 
+
+``return $this->container->get('doctrine');``
+
+
+Controller uses a Trait which is
+``Symfony\Bundle\FrameworkBundle\Controller\ControllerTrait``
+
+Inside the Trait you'll find :
+```php
+    /**
+     * Shortcut to return the Doctrine Registry service.
+     *
+     * @return ManagerRegistry
+     *
+     * @throws \LogicException If DoctrineBundle is not available
+     *
+     * @final since version 3.4
+     */
+    protected function getDoctrine()
+    {
+        if (!$this->container->has('doctrine')) {
+            throw new \LogicException('The DoctrineBundle is not registered in your application. Try running "composer require symfony/orm-pack".');
+        }
+
+        return $this->container->get('doctrine');
+    }
+```
+
+So if the service exists inside the container the method return the service itself. So this two calls are identical.
+The object returned is a 
+
+``Doctrine\Bundle\DoctrineBundle\Registry``
+
+which extends :
+
+``Symfony\Bridge\Doctrine\ManagerRegistry``
+
+which is in the BridgeBundle for Symfony & Doctrine. This class extends :
+
+``Doctrine\Common\Persistence\AbstractManagerRegistry``
+
+Which can make you understand what that call (``$this->getDoctrine()``) do.
+This class can give you a lot of informations:
+
+- getManager($name = null) Returns the default EntityManager if not specified anything else
+
+```php    /**
+        * {@inheritdoc}
+        *
+        * @throws \InvalidArgumentException
+        */
+       public function getManager($name = null)
+       {
+           if (null === $name) {
+               $name = $this->defaultManager;
+           }
+   
+           if (!isset($this->managers[$name])) {
+               throw new \InvalidArgumentException(sprintf('Doctrine %s Manager named "%s" does not exist.', $this->name, $name));
+           }
+   
+           return $this->getService($this->managers[$name]);
+       }
+```
+
+- getRepository($persistentObjectName, $persistentManagerName = null) this method returns the Repository and it is
+very interesting... *you must have a look a it!* 
+
+```php
+    /**
+     * {@inheritdoc}
+     */
+    public function getRepository($persistentObjectName, $persistentManagerName = null)
+    {
+        return $this->getManager($persistentManagerName)->getRepository($persistentObjectName);
+    }
+```
+
+Through this bunch of classes... (is it really a bunch ?) you can have access at your persistence.
+to be clear, the best way to access the Entity manager is through its own name. You can have multiple
+EntityManager with multiple connections and if you use the proper name you will follow a best practice.
+
+In order to access to the entity manager you should call:
+
+``$this->get('doctrine.orm.entity_manager');`` 
+
+This call gives you access to the default entity manager; one of your best friend when you work with
+Symfony is the command :
+
+``bin/console debug:container``
+
+it shows all the public services available in the container, executing the command "grepping" doctrine words it will
+filter only the services for doctrine.
+
+```text
+  ...
+  doctrine                                     Doctrine\Bundle\DoctrineBundle\Registry
+  doctrine.dbal.default_connection             Doctrine\DBAL\Connection
+  doctrine.orm.default_entity_manager          Doctrine\ORM\EntityManager
+  doctrine.orm.entity_manager                  alias for "doctrine.orm.default_entity_manager"
+  ...
+``` 
+As you can see entity_manager is an alias for default_entity_manager which of type ``Doctrine\ORM\EntityManager``.
+The EntityManager has access to a method ``getRepository`` and also extends ObjectManager which gives
+you access to methods like persists & flush. Through the EM you have access to these methods :
+
+- persist
+- remove
+- flush
+
+When you need to update or create an object you'll call *persist()*
+When you need to remove an object you'll call *remove()*
+
+But in order to start the transaction that will do an INSERT|UPDATE|DELETE in the database layer you need to call
+the **flush()** after the persist or remove.
+
+####Entity Repositories
+Every time you need to access data from doctrine you need to call queries from a **Repository**. 
+A Repository is in fact a Finder Object available for every Entity, which gives you access to some methods already implemented 
+inside Doctrine and also you can implement yours inside the Repository class itself.
+To have a Repository available you need to specify the proper annotation in the class doc-block; have a look at
+the Account class :
+
+```php
+/**
+ * @ORM\Entity
+ * @ORM\Table(name="account")
+ * @ORM\Entity(repositoryClass="AppBundle\Repository\AccountRepository")
+ */
+class Account
+{
+.....
+```
+
+The repository is a class for convention has the suffix 'Repository' and the filename is usually
+is {ENTITYNAME}Repository.php placed in a directory ``Repository``.
+
+If you have a look at the repository Account class :
+
+```php
+<?php declare(strict_types=1);
+
+namespace AppBundle\Repository;
+
+use Doctrine\ORM\EntityRepository;
+
+class AccountRepository extends EntityRepository
+{
+
+}
+```
+
+it's super Simple! .... and **EMPTY!**
+Why empty ? Beacause the ObjectRepository class (*Doctrine\Common\Persistence\ObjectRepository*) forces the EntityManager (which extends it),
+to implement these methods, which are common to all Repositories :
+
+```php
+- public function find($id, $lockMode = null, $lockVersion = null)
+- public function findAll()
+- public function findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
+- public function findOneBy(array $criteria, array $orderBy = null)
+```
+
+That's why the AccountRepository class is empty, you already have methods available in order to make
+queries against the Entity on DB.
+
+#####findAll()
+is a self explaining : fetch all Entities
+
+#####find
+Finds an entity by its primary key / identifier.
+
+#####findBy
+Finds entities by a set of criteria.
+
+#####findOneBy
+Finds a single entity by a set of criteria.
+
+#####Magic methods --> findBy and findOneBy
+Thanks to the use of __call magic methods you can call in the repository directly this methods in our
+Account example :
+
+``findByType``
+
+``findOneByType``
+
+even if these methods are not really defined. This magic is possible with the use of __call() :
+
+```__call() is triggered when invoking inaccessible methods in an object context.```
  
+ 
+##END of branch : doctrine1
+if you have properly :
+- created the database
+- updated the schema
+- cleared cache
+
+you can load the application with these two endpoints:
+
+http://localhost/accounts/list
+http://localhost/accounts/add

@@ -17,9 +17,7 @@ class AccountController extends Controller
      */
     public function showAction(Request $request)
     {
-        $accounts = $this->getDoctrine()
-            ->getRepository(Account::class)
-            ->findAll();
+        $accounts = $this->get('doctrine')->getRepository(Account::class)->findAll();
 
         return $this->render('@App/Account/list.html.twig', array(
             'accounts' => $accounts,
@@ -39,7 +37,7 @@ class AccountController extends Controller
         $form->handleRequest($request);
         if ($form->isSubmitted() && $form->isValid()) {
 
-            $entityManager = $this->getDoctrine()->getManager();
+            $entityManager = $this->get('doctrine')->getManager();
             $entityManager->persist($account);
             $entityManager->flush();
 

@@ -17,6 +17,9 @@ services:
             #- ./var/logs:/var/www/html/var/logs:delegated
             #- ./var/sessions:/var/www/html/sessions:delegated
             #- ./vendor:/var/www/html/vendor
+        networks:
+            doctrine_training:
+                ipv4_address: 172.30.12.7
 
     nginx:
         container_name: doctrine_training_nginx
@@ -32,6 +35,9 @@ services:
             - .:/var/www/html
         ports:
           - "80:80"
+        networks:
+            doctrine_training:
+                ipv4_address: 172.30.12.6
 
     mysql:
         image: mysql:5.7.23
@@ -44,3 +50,14 @@ services:
             - MYSQL_DATABASE=root
         ports:
             - "3306:3306"
+        networks:
+            doctrine_training:
+                ipv4_address: 172.30.12.5
+
+networks:
+    doctrine_training:
+        driver: bridge
+        ipam:
+            driver: default
+            config:
+            - subnet: 172.30.12.0/24
