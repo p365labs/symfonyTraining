@@ -5,6 +5,8 @@ namespace AppBundle\Entity;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use Ramsey\Uuid\Uuid;
+use Ramsey\Uuid\UuidInterface;
 
 
 /**
@@ -15,9 +17,9 @@ use Doctrine\ORM\Mapping as ORM;
 class Contact
 {
     /**
-     * @ORM\Column(type="integer")
      * @ORM\Id
-     * @ORM\GeneratedValue(strategy="AUTO")
+     * @ORM\Column(type="uuid", unique=true)
+     * var UuidInterface|null
      */
     public $id;
 
@@ -39,7 +41,7 @@ class Contact
     public $addresses;
 
     /**
-     * @ORM\OneToMany(targetEntity="Phone", mappedBy="contact", cascade={"persist"})
+     * @ORM\OneToMany(targetEntity="Phone", mappedBy="contact", cascade={"persist"}, orphanRemoval=true)
      *
      * @var Collection $phone
      */
@@ -53,6 +55,7 @@ class Contact
 
     public function __construct()
     {
+        $this->id           = Uuid::uuid4();
         $this->name         = "";
         $this->surname      = "";
         $this->addresses    = new ArrayCollection();
@@ -60,9 +63,9 @@ class Contact
     }
 
     /**
-     * @return int
+     * @return UuidInterface $id
      */
-    public function getId(): int
+    public function getId(): UuidInterface
     {
         return $this->id;
     }
@@ -130,14 +133,13 @@ class Contact
      */
     public function removeAddress(Address $address): void
     {
-//        $address->setContact(null);
         $this->addresses->removeElement($address);
     }
 
     /**
      * @return Collection
      */
-    public function getPhones()
+    public function getPhones(): Collection
     {
         return $this->phones;
     }
@@ -145,7 +147,7 @@ class Contact
     /**
      * @param Collection $phones
      */
-    public function setPhones($phones)
+    public function setPhones($phones): void
     {
         $this->phones = $phones;
     }
@@ -153,17 +155,17 @@ class Contact
     /**
      * @param Phone $phone
      */
-    public function addPhone(Phone $phone)
+    public function addPhone(Phone $phone): void
     {
+        $this->phones->add($phone);
         // needed to update the owning side of the relationship!
         $phone->setContact($this);
-        $this->phones->add($phone);
     }
 
     /**
      * @param Phone $phone
      */
-    public function removePhone(Phone $phone)
+    public function removePhone(Phone $phone): void
     {
         $this->phones->removeElement($phone);
     }

@@ -7,6 +7,7 @@ use AppBundle\Form\AccountType;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\VarDumper\VarDumper;
 
 class AccountController extends Controller
 {
@@ -35,12 +36,14 @@ class AccountController extends Controller
         $form = $this->createForm(AccountType::class, $account);
 
         $form->handleRequest($request);
+
         if ($form->isSubmitted() && $form->isValid()) {
 
             $entityManager = $this->get('doctrine')->getManager();
             $entityManager->persist($account);
 
             $entityManager->flush();
+
 
             return $this->redirectToRoute('account_list');
         }

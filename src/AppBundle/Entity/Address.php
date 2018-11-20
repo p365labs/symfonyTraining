@@ -5,6 +5,8 @@ namespace AppBundle\Entity;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use Ramsey\Uuid\Uuid;
+use Ramsey\Uuid\UuidInterface;
 
 /**
  * Class Address
@@ -15,9 +17,9 @@ use Doctrine\ORM\Mapping as ORM;
 class Address
 {
     /**
-     * @ORM\Column(type="integer")
      * @ORM\Id
-     * @ORM\GeneratedValue(strategy="AUTO")
+     * @ORM\Column(type="uuid", unique=true)
+     * var UuidInterface|null
      */
     public $id;
 
@@ -51,20 +53,24 @@ class Address
      */
     public function __construct()
     {
+        $this->id       = Uuid::uuid4();
+        $this->address  = "";
+        $this->zip      = "";
+        $this->country  = "";
     }
 
     /**
-     * @return int
+     * @return UuidInterface $id
      */
-    public function getId(): int
+    public function getId(): UuidInterface
     {
         return $this->id;
     }
 
     /**
-     * @return mixed $address
+     * @return string
      */
-    public function getAddress()
+    public function getAddress(): string
     {
         return $this->address;
     }
@@ -78,9 +84,9 @@ class Address
     }
 
     /**
-     * @return mixed $zip
+     * @return string
      */
-    public function getZip()
+    public function getZip(): string
     {
         return $this->zip;
     }
@@ -88,15 +94,15 @@ class Address
     /**
      * @param string $zip
      */
-    public function setZip(string $zip): void
+    public function setZip($zip): void
     {
         $this->zip = $zip;
     }
 
     /**
-     * @return mixed $country
+     * @return string
      */
-    public function getCountry()
+    public function getCountry(): string
     {
         return $this->country;
     }
@@ -104,7 +110,7 @@ class Address
     /**
      * @param string $country
      */
-    public function setCountry(string $country): void
+    public function setCountry($country): void
     {
         $this->country = $country;
     }

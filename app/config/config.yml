@@ -50,6 +50,9 @@ doctrine:
         default_table_options:
             charset: utf8mb4
             collate: utf8mb4_unicode_ci
+        server_version: '5.7'
+        types:
+            uuid:  Ramsey\Uuid\Doctrine\UuidType
         # if using pdo_sqlite as your database driver:
         #   1. add the path in parameters.yml
         #     e.g. database_path: '%kernel.project_dir%/var/data/data.sqlite'

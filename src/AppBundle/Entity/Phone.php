@@ -3,6 +3,8 @@
 namespace AppBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
+use Ramsey\Uuid\Uuid;
+use Ramsey\Uuid\UuidInterface;
 
 /**
  * @ORM\Entity
@@ -12,9 +14,9 @@ use Doctrine\ORM\Mapping as ORM;
 class Phone
 {
     /**
-     * @ORM\Column(type="integer")
      * @ORM\Id
-     * @ORM\GeneratedValue(strategy="AUTO")
+     * @ORM\Column(type="uuid", unique=true)
+     * var UuidInterface|null
      */
     public $id;
 
@@ -26,7 +28,7 @@ class Phone
 
     /**
      * Many Phones have One Contact.
-     * @ORM\ManyToOne(targetEntity="Contact", inversedBy="phones")
+     * @ORM\ManyToOne(targetEntity="Contact", inversedBy="phones", cascade={"persist"})
      * @ORM\JoinColumn(name="contact_id", referencedColumnName="id")
      */
     public $contact;
@@ -36,12 +38,13 @@ class Phone
      */
     public function __construct()
     {
+        $this->id   = Uuid::uuid4();
     }
 
     /**
-     * @return int
+     * @return UuidInterface $id
      */
-    public function getId(): int
+    public function getId(): UuidInterface
     {
         return $this->id;
     }
@@ -57,7 +60,7 @@ class Phone
     /**
      * @param string $number
      */
-    public function setNumber(string $number): void
+    public function setNumber($number): void
     {
         $this->number = $number;
     }

@@ -2,7 +2,11 @@
 parameters:
     database_host: doctrine_training_mysql
     database_port: null
+<<<<<<< Updated upstream
     database_name: symfony_doctrine_1_2_onetomany
+=======
+    database_name: symfony_doctrine2_5_ID
+>>>>>>> Stashed changes
     database_user: root
     database_password: root
     mailer_transport: smtp

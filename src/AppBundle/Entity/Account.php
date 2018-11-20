@@ -3,6 +3,8 @@
 namespace AppBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
+use Ramsey\Uuid\Uuid;
+use Ramsey\Uuid\UuidInterface;
 
 /**
  * @ORM\Entity
@@ -15,9 +17,9 @@ class Account
     const ACCOUNT_TYPE_BUSINESS = true;
 
     /**
-     * @ORM\Column(type="integer")
      * @ORM\Id
-     * @ORM\GeneratedValue(strategy="AUTO")
+     * @ORM\Column(type="uuid", unique=true)
+     * var UuidInterface|null
      */
     public $id;
 
@@ -33,14 +35,15 @@ class Account
 
     /**
      * One Account has One Contact.
-     * @ORM\OneToOne(targetEntity="Contact", inversedBy="account", cascade={"persist"})
-     * @ORM\JoinColumn(name="account_id", referencedColumnName="id")
+     * @ORM\OneToOne(targetEntity="Contact", inversedBy="account", cascade={"all"})
+     * @ORM\JoinColumn(name="contact_id", referencedColumnName="id")
      * @var Contact $contact
      */
     public $contact;
 
     public function __construct()
     {
+        $this->id           = Uuid::uuid4();
         $this->type         = Account::ACCOUNT_TYPE_PRIVATE;
         $this->tax_code     = "";
         $this->contact      = new Contact();
@@ -48,9 +51,9 @@ class Account
     }
 
     /**
-     * @return int
+     * @return UuidInterface $id
      */
-    public function getId(): int
+    public function getId(): UuidInterface
     {
         return $this->id;
     }

@@ -1,4 +1,4 @@
-#A Symfony project 3.x
+# A Symfony project 3.x
 
 =====================
 
@@ -127,11 +127,11 @@ the directories of Symfony you should absolutely know and with which you will wo
 - var
 - web
 
-###app
+### app
 ```app``` is one of the main directories of Symfony. Inside you'll have all the config yaml files needed to work with your framework.
 
 let's get a deep overview at the 
-#####config yaml files :
+##### config yaml files :
 
 - config.yml
 - config_dev.yml 
@@ -162,7 +162,7 @@ parameters:
     database_password: root
 ```
 
-#####routing.yml
+##### routing.yml
 
 The routing yaml file is the very first routing file you encounter during your 
 first approach to Symfony. It is the general one and in fact is not really 
@@ -175,20 +175,20 @@ app:
     type: annotation
 ```
 
-###bin
+### bin
 Bin directory contains the **console** command which is more or less the command you execute
 every single moment when you work with Symfony : clearing caches, mapping doctrine info, load fixtures,
 etc etc. In general you can find other executabels usefuls for debugging with Symfony.
 
-###src
+### src
 it the root of ur project! All the source code should be placed in this directory
 
-###var
+### var
 Var is a very important directory, you'll find inside cache directory, logs directory
 and session one. Logs file for a developer are sux important, start using terminal with *tail -f var/logs/dev.log*
 always open!
  
-###web  
+### web  
 This directory contains the Front-Controller which is where all requests coming
 from the Internet come from.
 
@@ -237,7 +237,7 @@ $kernel = new AppKernel('dev', true);
 
 The dev file load the AppKernel with dev environment and debug set to true
 
-##Branch `doctrine 1` 
+## Branch `doctrine 1` 
 
 **Application Architecture**
 
@@ -302,7 +302,7 @@ The Routing library has 3 main basic components :
 - RouteContext
 - UrlMatcher
 
-####RouteCollection [link](https://api.symfony.com/3.4/Symfony/Component/Routing/RouteCollection.html)
+#### RouteCollection [link](https://api.symfony.com/3.4/Symfony/Component/Routing/RouteCollection.html)
 
 The idea behind routing is pretty simple :)
 
@@ -356,7 +356,7 @@ $matcher = new UrlMatcher($routes, $context);
 $parameters = $matcher->match('/foo');
 // array('_controller' => 'MyController', '_route' => 'route_name')
 ```
-#####Route
+##### Route
 The Route object accept accept many values on constructor
 
 ```php
@@ -453,7 +453,7 @@ and has some property more than usual property.
 Every Entity *must* have and Identifier which should be identified by the annotation : **@Id**
 You can implement different strategies for Identity generation.
 
-####Identty Strategy generation
+#### Identty Strategy generation
 - AUTO (default): Tells Doctrine to pick the strategy that is preferred by the used database platform. The preferred strategies are IDENTITY for MySQL, SQLite, MsSQL and SQL Anywhere and SEQUENCE for Oracle and PostgreSQL. This strategy provides full portability.
 
 - SEQUENCE: Tells Doctrine to use a database sequence for ID generation. This strategy does currently not provide full portability. Sequences are supported by Oracle, PostgreSql and SQL Anywhere.
@@ -468,7 +468,7 @@ You can implement different strategies for Identity generation.
 
 - CUSTOM: With this option, you can use the @CustomIdGenerator annotation. It will allow you to pass a class of your own to generate the identifiers.
 
-###Command with Doctrine
+### Command with Doctrine
 One of the very first thing you need to know when working with doctrine is a set of commmand that could make your life easier.
 
 The very first time you setup a Symfony project with doctrine you have to create a new database, defined in the parameters.yml,
@@ -495,7 +495,7 @@ useful to se if something's broke and if your entities are valid doctrine entiti
 
 Play a bit with these commands in order to understand their meaning and how to execute them.
 
-###Doctrine Entities and Doctrine EntityManager
+### Doctrine Entities and Doctrine EntityManager
 
 Always remember to use the doctrine documentation, for a good starting point on it have a look it [here](https://www.doctrine-project.org/projects/doctrine-orm/en/2.6/tutorials/getting-started.html)
 
@@ -627,7 +627,7 @@ When you need to remove an object you'll call *remove()*
 But in order to start the transaction that will do an INSERT|UPDATE|DELETE in the database layer you need to call
 the **flush()** after the persist or remove.
 
-####Entity Repositories
+#### Entity Repositories
 Every time you need to access data from doctrine you need to call queries from a **Repository**. 
 A Repository is in fact a Finder Object available for every Entity, which gives you access to some methods already implemented 
 inside Doctrine and also you can implement yours inside the Repository class itself.
@@ -677,19 +677,19 @@ to implement these methods, which are common to all Repositories :
 That's why the AccountRepository class is empty, you already have methods available in order to make
 queries against the Entity on DB.
 
-#####findAll()
+##### findAll()
 is a self explaining : fetch all Entities
 
-#####find
+##### find
 Finds an entity by its primary key / identifier.
 
-#####findBy
+##### findBy
 Finds entities by a set of criteria.
 
-#####findOneBy
+##### findOneBy
 Finds a single entity by a set of criteria.
 
-#####Magic methods --> findBy and findOneBy
+##### Magic methods --> findBy and findOneBy
 Thanks to the use of __call magic methods you can call in the repository directly this methods in our
 Account example :
 
@@ -702,6 +702,7 @@ even if these methods are not really defined. This magic is possible with the us
 ```__call() is triggered when invoking inaccessible methods in an object context.```
  
  
+## END of branch : doctrine1
 if you have properly :
 - created the database
 - updated the schema
@@ -711,19 +712,18 @@ you can load the application with these two endpoints:
 
 http://localhost/accounts/list
 http://localhost/accounts/add
-##END of branch : doctrine1
 
 
-##Branch `doctrine 2`
+## Branch `doctrine 2`
 
-###Doctrine Association Mapping
+### Doctrine Association Mapping
 
-#####Update our vendor directory :
+##### Update our vendor directory :
 
 ``docker exec -it doctrine_training_php composer install``
 
 
-#####In this new branch we will use webpack + yarn to manage assets dependencies
+##### In this new branch we will use webpack + yarn to manage assets dependencies
 and to build SCSS and Javascripts.
 
 You need to have installed npm and node.js
@@ -732,7 +732,7 @@ You need to have installed npm and node.js
 
 ```npm run encore -- dev```
 
-#####Let's update the database :
+##### Let's update the database :
 
 - ./con.sh "doctrine:database:drop --force"
 - ./con.sh "doctrine:database:create"
@@ -750,7 +750,7 @@ custom CSS|JS has been updated).
 
 The application is still available on port 80 with the same endpoint of the previous branch.
 
-###One-to-One unidirectional relationship
+### One-to-One unidirectional relationship
 Let's analyse our first example, our domain model tell us that an Account has a one-to-one relationship with a Contact.
 Every Contact has an account and vice-versa.
 
@@ -788,18 +788,18 @@ A unidirectional relationship only has an **owning side**.
 - Owning side
 - Inverse side
 
-####Owning Side
+#### Owning Side
 - The Owning Side of a relationship is the side which **hold** the relation.
 - The owning side has to have the inversedBy attribute of the OneToOne, ManyToOne, or ManyToMany mapping declaration.
 - The inversedBy attribute contains the name of the association-field on the inverse-side.
 - The owning side of a OneToOne association is the entity with the table containing **the foreign key**.
  
 
-####Inverse Side
+#### Inverse Side
 - The inverse side has to have the mappedBy attribute of the OneToOne, OneToMany, or ManyToMany mapping declaration. The mappedBy attribute contains the name of the association-field on the owning side.
 
 
-###One-to-One Bidirectional relationship
+### One-to-One Bidirectional relationship
 
 Bidirectional relationships have both owning side and inverse side. Thiis could be useful when you need
 to access a related property from one side to another. When you should do it ? Well actually it depends...
@@ -877,7 +877,7 @@ ALTER TABLE account
   REFERENCES contact (id);
 ```
 
-###One-To-Many Bidirectional relationship
+### One-To-Many Bidirectional relationship
 
 Remember these things on One-To-Many relationships
 
@@ -1013,7 +1013,7 @@ On the collection you can access the methods ``add`` or ``remove``.
 
 
 
-####Collections
+#### Collections
 You **should** always initialise Collections when using @OneToMany or @ManyToMany relationship inside the constructor
 of the class which has to access them.
 
