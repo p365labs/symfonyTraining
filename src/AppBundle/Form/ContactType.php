@@ -13,22 +13,21 @@ class ContactType extends AbstractType
 {
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
-
-        /* 'by_reference' => false*/
-
         $builder
             ->add('name', TextType::class)
             ->add('surname', TextType::class)
             ->add('phones', CollectionType::class, array(
                 'entry_type' => PhoneType::class,
                 'entry_options' => array('label' => false),
-                'allow_add' => true
+                'allow_add' => true,
+                'by_reference' => false
             ))
 
             ->add('addresses', CollectionType::class, array(
                 'entry_type' => AddressType::class,
                 'entry_options' => array('label' => false),
-                'allow_add' => true
+                'allow_add' => true,
+                'by_reference' => false
             ))
         ;
     }
