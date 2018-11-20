@@ -799,6 +799,81 @@ A unidirectional relationship only has an **owning side**.
 - The inverse side has to have the mappedBy attribute of the OneToOne, OneToMany, or ManyToMany mapping declaration. The mappedBy attribute contains the name of the association-field on the owning side.
 
 
+###One-to-One Bidirectional relationship
 
+Bidirectional relationships have both owning side and inverse side. Thiis could be useful when you need
+to access a related property from one side to another. When you should do it ? Well actually it depends...
+it depends from your business case, the idea behind this is : 
 
+``if you don't need it don't use it`` 
+
+Let's make some examples :
+
+- User <-> Email 
+
+The key point is trying to understand the use case, and then how the application will be modeled, don't think about the DATABASE at this stage of your analysis
+
+Think about an application where has a relationshitp with an Entity called Email. A User in our particular busiiness case
+could have only *One* email, so the OneToOne relationships is a perfect match for our needs.
+
+Now let's think about owning side and inverse side, who should own the side we want to persist and maybe
+if we want to cascade the persist.
+
+```text
+Changes made only to the inverse side of an association are ignored. 
+Make sure to update both sides of a bidirectional association 
+(or at least the owning side, from Doctrine's point of view)
+
+The owning side of a bidirectional association is the side Doctrine 
+"looks at" when determining the state of the association, and 
+consequently whether there is anything to do to update 
+the association in the database.
+```
+
+If in our business use-case we usually use to amend the User and from the User its own email, and not the contrary (from email amending the User).
+
+We should **use** an unidirectional relationship with the User has the **owning side**.
+Every time we amend an email from the User relationship it the cascade will respected also for the Email entity.
+This Doctrine's behaviour.  
+- User <-> Cart
+
+Let's analyse a different example: an e-commerce website where User can register and buy things with a classic
+cart system.
+
+If we think at this use case a User can have a list of all of its carts and their statuses, but also an Administrator
+can amend a User or view its data, by inspecting a list of all the carts available.
+
+This is a perfect example where both sides of the relationships **should** be *Owning* and *Inverse* side.
+In both cases your cascades will be *respected* by Doctrine. 
+
+``Rememeber that apart from Doctrine your strategies on business entities should managed by developers.`` 
+
+  
+If we had a look at our example on source code now we've implemented a bidirectional relationships between 
+*Account <-> Contact* have a look at the query to create the schema for this particular relation.
+
+```sql
+CREATE TABLE account (
+  id INT AUTO_INCREMENT NOT NULL, 
+  account_id INT DEFAULT NULL, 
+  type TINYINT(1) NOT NULL, 
+  tax_code VARCHAR(100) NOT NULL, 
+    UNIQUE INDEX UNIQ_7D3656A49B6B5FBA (account_id), 
+    PRIMARY KEY(id))
+        DEFAULT CHARACTER SET utf8mb4 
+        COLLATE utf8mb4_unicode_ci ENGINE = InnoDB;
+    
+CREATE TABLE contact (
+  id INT AUTO_INCREMENT NOT NULL, 
+  name VARCHAR(100) NOT NULL, 
+  surname VARCHAR(100) NOT NULL, 
+  PRIMARY KEY(id)) 
+        DEFAULT CHARACTER SET utf8mb4 
+        COLLATE utf8mb4_unicode_ci ENGINE = InnoDB;
+
+ALTER TABLE account 
+  ADD CONSTRAINT FK_7D3656A49B6B5FBA 
+  FOREIGN KEY (account_id) 
+  REFERENCES contact (id);
+```
 

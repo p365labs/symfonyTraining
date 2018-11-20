@@ -33,8 +33,8 @@ class Account
 
     /**
      * One Account has One Contact.
-     * @ORM\OneToOne(targetEntity="Contact", cascade={"all"})
-     * @ORM\JoinColumn(name="contact_id", referencedColumnName="id")
+     * @ORM\OneToOne(targetEntity="Contact", inversedBy="account", cascade={"persist"})
+     * @ORM\JoinColumn(name="account_id", referencedColumnName="id")
      * @var Contact $contact
      */
     public $contact;
