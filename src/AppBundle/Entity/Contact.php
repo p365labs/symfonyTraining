@@ -2,6 +2,8 @@
 
 namespace AppBundle\Entity;
 
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 
 
@@ -30,34 +32,29 @@ class Contact
     public $surname;
 
     /**
-     * @ORM\Column(type="string", length=100)
-     * @var string $address
+     * @ORM\OneToMany(targetEntity="Address", mappedBy="contact", cascade={"persist"})
+     *
+     * @var Collection $address
      */
-    public $address;
+    public $addresses;
 
     /**
-     * @ORM\Column(type="string", length=100)
-     * @var string $phone
+     * @ORM\OneToMany(targetEntity="Phone", mappedBy="contact", cascade={"persist"})
+     *
+     * @var Collection $phone
      */
-    public $phone;
-
-    /**
-     * One Contact has One Account.
-     * @ORM\OneToOne(targetEntity="Account", mappedBy="contact", cascade={"persist"})
-     */
-    public $account;
+    public $phones;
 
     public function __construct()
     {
-        $this->name     = "";
-        $this->surname  = "";
-        $this->phone    = "";
-        $this->address  = "";
-        
+        $this->name         = "";
+        $this->surname      = "";
+        $this->addresses    = new ArrayCollection();
+        $this->phones       = new ArrayCollection();
     }
 
     /**
-     * @return mixed
+     * @return int
      */
     public function getId(): int
     {
@@ -65,7 +62,7 @@ class Contact
     }
 
     /**
-     * @return mixed
+     * @return string
      */
     public function getName(): string
     {
@@ -73,9 +70,9 @@ class Contact
     }
 
     /**
-     * @param mixed $name
+     * @param string $name
      */
-    public function setName($name): void
+    public function setName(string $name): void
     {
         $this->name = $name;
     }
@@ -89,59 +86,81 @@ class Contact
     }
 
     /**
-     * @param mixed $surname
+     * @param string $surname
      */
-    public function setSurname($surname): void
+    public function setSurname(string $surname): void
     {
         $this->surname = $surname;
     }
 
     /**
-     * @return string
+     * @return Collection
      */
-    public function getAddress(): string
+    public function getAddresses(): Collection
     {
-        return $this->address;
+        return $this->addresses;
     }
 
     /**
-     * @param string $address
+     * @param Collection $addresses
      */
-    public function setAddress($address): void
+    public function setAddresses(Collection $addresses): void
     {
-        $this->address = $address;
+        $this->addresses = $addresses;
     }
 
     /**
-     * @return string
+     * @param Address $address
      */
-    public function getPhone(): string
+    public function addAddress(Address $address): void
     {
-        return $this->phone;
+        // needed to update the owning side of the relationship!
+        $address->setContact($this);
+        $this->addresses->add($address);
     }
 
     /**
-     * @param string $phones
+     * @param Address $address
      */
-    public function setPhone($phone): void
+    public function removeAddress(Address $address): void
     {
-        $this->phone = $phone;
+//        $address->setContact(null);
+        $this->addresses->removeElement($address);
     }
 
     /**
-     * @return mixed
+     * @return Collection
      */
-    public function getAccount()
+    public function getPhones()
     {
-        return $this->account;
+        return $this->phones;
     }
 
     /**
-     * @param mixed $account
+     * @param Collection $phones
      */
-    public function setAccount($account): void
+    public function setPhones($phones)
     {
-        $this->account = $account;
+        $this->phones = $phones;
+    }
+
+    /**
+     * @param Phone $phone
+     */
+    public function addPhone(Phone $phone)
+    {
+        // needed to update the owning side of the relationship!
+        $phone->setContact($this);
+        $this->phones->add($phone);
+    }
+
+    /**
+     * @param Phone $phone
+     */
+    public function removePhone(Phone $phone)
+    {
+//        $phone->setContact(null);
+        $this->phones->removeElement($phone);
     }
 
     public function __toString()

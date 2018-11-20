@@ -24,6 +24,7 @@ RUN apk add --no-cache \
         vim \
         acl \
         sudo \
+        mysql-client \
 	&& docker-php-ext-install -j2 \
 		mcrypt \
 		intl \
@@ -39,7 +40,7 @@ RUN apk add --no-cache \
 	&& pecl clear-cache \
 	&& mv /usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini /usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini.disabled \
 	&& kill -USR2 1
-
+#xdebug.max_nesting_level = 10000
 RUN apk add gnu-libiconv --update-cache --repository http://dl-cdn.alpinelinux.org/alpine/edge/testing/ --allow-untrusted
 ENV LD_PRELOAD /usr/lib/preloadable_libiconv.so php
 

@@ -10,6 +10,7 @@ Encore
     .addEntry('app_css', './assets/css/global.scss')
     .autoProvidejQuery()
     .enableSassLoader()
+    .disableSingleRuntimeChunk()
     //.enableVersioning()
 
 
