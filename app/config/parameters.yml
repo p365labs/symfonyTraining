@@ -2,7 +2,7 @@
 parameters:
     database_host: doctrine_training_mysql
     database_port: null
-    database_name: symfony_doctrine_1_1_bi
+    database_name: symfony_doctrine_1_2_onetomany
     database_user: root
     database_password: root
     mailer_transport: smtp

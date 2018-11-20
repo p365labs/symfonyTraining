@@ -165,7 +165,6 @@ class Contact
      */
     public function removePhone(Phone $phone)
     {
-//        $phone->setContact(null);
         $this->phones->removeElement($phone);
     }
 
