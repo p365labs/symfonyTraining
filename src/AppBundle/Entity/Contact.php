@@ -45,6 +45,12 @@ class Contact
      */
     public $phones;
 
+    /**
+     * One Contact has One Account.
+     * @ORM\OneToOne(targetEntity="Account", mappedBy="contact", cascade={"persist"})
+     */
+    public $account;
+
     public function __construct()
     {
         $this->name         = "";
@@ -161,6 +167,22 @@ class Contact
     {
 //        $phone->setContact(null);
         $this->phones->removeElement($phone);
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getAccount()
+    {
+        return $this->account;
+    }
+
+    /**
+     * @param Account $account
+     */
+    public function setAccount(Account $account): void
+    {
+        $this->account = $account;
     }
 
     public function __toString()
