@@ -39,6 +39,17 @@ class AccountController extends Controller
 
             $entityManager = $this->get('doctrine')->getManager();
             $entityManager->persist($account);
+
+            foreach ($account->getContact()->getPhones() as $phone)
+            {
+                $account->getContact()->addPhone($phone);
+            }
+
+            foreach ($account->getContact()->getAddresses() as $address)
+            {
+                $account->getContact()->addAddress($address);
+            }
+
             $entityManager->flush();
 
             return $this->redirectToRoute('account_list');

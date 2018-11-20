@@ -877,3 +877,164 @@ ALTER TABLE account
   REFERENCES contact (id);
 ```
 
+### One-To-Many Bidirectional relationship
+
+Remember these things on One-To-Many relationships
+
+````
+The inverse side has to have the mappedBy attribute of the OneToOne, OneToMany, or ManyToMany mapping declaration. The mappedBy attribute contains the name of the association-field on the owning side.
+
+The owning side has to have the inversedBy attribute of the OneToOne, ManyToOne, or ManyToMany mapping declaration.
+The inversedBy attribute contains the name of the association-field on the inverse-side.
+
+ManyToOne is always the owning side of a bidirectional association.
+
+OneToMany is always the inverse side of a bidirectional association.
+````
+
+In our example Contact has a many relationship with Phone and Address.
+
+```mysql
+CREATE TABLE address (
+  id INT AUTO_INCREMENT NOT NULL, 
+  contact_id INT DEFAULT NULL, 
+  address VARCHAR(100) NOT NULL, 
+  zip VARCHAR(100) NOT NULL, 
+  country VARCHAR(100) NOT NULL, 
+    INDEX IDX_D4E6F81E7A1254A (contact_id), 
+    PRIMARY KEY(id)) 
+      DEFAULT CHARACTER SET utf8mb4 
+      COLLATE utf8mb4_unicode_ci 
+      ENGINE = InnoDB;
+    
+CREATE TABLE contact (
+  id INT AUTO_INCREMENT NOT NULL, 
+  name VARCHAR(100) NOT NULL, 
+  surname VARCHAR(100) NOT NULL, 
+    PRIMARY KEY(id)) 
+      DEFAULT CHARACTER SET utf8mb4 
+      COLLATE utf8mb4_unicode_ci 
+      ENGINE = InnoDB;
+    
+CREATE TABLE phone (
+  id INT AUTO_INCREMENT NOT NULL, 
+  contact_id INT DEFAULT NULL, 
+  number VARCHAR(100) NOT NULL, 
+    INDEX IDX_444F97DDE7A1254A (contact_id), 
+    PRIMARY KEY(id)) 
+      DEFAULT CHARACTER SET utf8mb4 
+      COLLATE utf8mb4_unicode_ci 
+      ENGINE = InnoDB;
+      
+ALTER TABLE address 
+  ADD CONSTRAINT FK_D4E6F81E7A1254A 
+  FOREIGN KEY (contact_id) 
+    REFERENCES contact (id);
+    
+ALTER TABLE phone 
+  ADD CONSTRAINT FK_444F97DDE7A1254A 
+  FOREIGN KEY (contact_id) 
+    REFERENCES contact (id);
+```
+
+In this case the owning side has the foreign key, so Address and Phone will have a contact_id key
+which refers to the Contact primary key.
+On the other hand Contact will hold a collection of ``phones`` and ``addresses`` which are only used by 
+Doctrine.
+
+The mapping tells Doctrine to use the contact_id column on the phone and address tables
+to relate each record in that table with a record in the contact table.
+
+Next, since a single Contact object will relate to many [Phones|Addresses] objects, a [Phones|Addresses]
+property can be added to the Contact class to hold those associated objects.
+
+this is the implementation on the Phone  class :
+
+
+```php
+    /**
+    * @ORM\Entity
+    * @ORM\Table(name="phone")
+    * @ORM\Entity(repositoryClass="AppBundle\Repository\PhoneRepository")
+    */
+   class Phone
+   {
+   ...
+   ...
+    /**
+     * Many Phones have One Contact.
+     * @ORM\ManyToOne(targetEntity="Contact", inversedBy="phones")
+     * @ORM\JoinColumn(name="contact_id", referencedColumnName="id")
+     */
+    public $contact;
+    
+    
+```
+
+The most interesting part is on The inverse side of the relationship, the ``One`` side will 
+hold a collection of objects.
+
+The Contact class will look like this one :
+
+```php
+    /**
+     * @ORM\OneToMany(targetEntity="Phone", mappedBy="contact", cascade={"persist"})
+     *
+     * @var Collection $phone
+     */
+    public $phones;
+```
+
+So phone will be a collection an object of type ``Doctrine\Common\Collections\Collection``
+And in order to be successful to manage objects inside the collection you have to properly implement 
+adder and remover inside the class Contact.
+
+```php
+    /**
+     * @param Phone $phone
+     */
+    public function addPhone(Phone $phone)
+    {
+        // needed to update the owning side of the relationship!
+        $phone->setContact($this);
+        $this->phones->add($phone);
+    }
+
+    /**
+     * @param Phone $phone
+     */
+    public function removePhone(Phone $phone)
+    {
+        $this->phones->removeElement($phone);
+    }
+```
+
+On the collection you can access the methods ``add`` or ``remove``.
+
+
+
+#### Collections
+You **should** always initialise Collections when using @OneToMany or @ManyToMany relationship inside the constructor
+of the class which has to access them.
+
+```php
+    public function __construct()
+    {
+        ...
+        $this->addresses    = new ArrayCollection();
+        $this->phones       = new ArrayCollection();
+    }
+```
+
+```
+Doctrine\Common\Collections\ArrayCollection;
+Doctrine\Common\Collections\Collection;
+```
+
+These Collection is the Interface implemented by the concrete class ArrayCollection which belong to the Doctrine's
+namespace. Doctrine Collections are simple PHP arrays with custom implementations in order to work properly
+with the lazy loading functionality.
+
+Actually Collection interface as this signature :
+
+``interface Collection extends Countable, IteratorAggregate, ArrayAccess``
