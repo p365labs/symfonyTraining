@@ -712,3 +712,93 @@ you can load the application with these two endpoints:
 
 http://localhost/accounts/list
 http://localhost/accounts/add
+
+
+## Branch `doctrine 2`
+
+### Doctrine Association Mapping
+
+##### Update our vendor directory :
+
+``docker exec -it doctrine_training_php composer install``
+
+
+##### In this new branch we will use webpack + yarn to manage assets dependencies
+and to build SCSS and Javascripts.
+
+You need to have installed npm and node.js
+
+```npm install```
+
+```npm run encore -- dev```
+
+##### Let's update the database :
+
+- ./con.sh "doctrine:database:drop --force"
+- ./con.sh "doctrine:database:create"
+- ./con.sh "doctrine:schema:create"
+
+now check if everything is ok :
+
+- ./con.sh "doctrine:schema:validate"
+- ./con.sh "doctrine:mapping:info"
+
+Now that the application has been updated let's see what has been updated.
+In the new branch we have more entities more entities relationships
+a lot of FormType and also implemented webpack with Symfony webpack encore (a new direcotry /assets with
+custom CSS|JS has been updated).
+
+The application is still available on port 80 with the same endpoint of the previous branch.
+
+### One-to-One unidirectional relationship
+Let's analyse our first example, our domain model tell us that an Account has a one-to-one relationship with a Contact.
+Every Contact has an account and vice-versa.
+
+The first example show us the simplest relationship : OneToOne unidirectional
+
+```sql
+CREATE TABLE account (
+  id INT AUTO_INCREMENT NOT NULL, 
+  contact_id INT DEFAULT NULL, 
+  type TINYINT(1) NOT NULL, 
+  tax_code VARCHAR(100) NOT NULL, 
+  UNIQUE INDEX UNIQ_7D3656A4E7A1254A (contact_id), 
+  PRIMARY KEY(id)) 
+    DEFAULT CHARACTER SET utf8mb4 
+    COLLATE utf8mb4_unicode_ci ENGINE = InnoDB;
+    
+CREATE TABLE contact (
+  id INT AUTO_INCREMENT NOT NULL, 
+  name VARCHAR(100) NOT NULL, 
+  surname VARCHAR(100) NOT NULL, 
+  PRIMARY KEY(id)) 
+    DEFAULT CHARACTER SET utf8mb4 
+    COLLATE utf8mb4_unicode_ci ENGINE = InnoDB;
+    
+ALTER TABLE account 
+  ADD CONSTRAINT FK_7D3656A4E7A1254A 
+  FOREIGN KEY (contact_id) 
+  REFERENCES contact (id);
+```
+
+Defining a relationship as Unidirectional introduces a new set of concepts :
+
+A unidirectional relationship only has an **owning side**.
+
+- Owning side
+- Inverse side
+
+#### Owning Side
+- The Owning Side of a relationship is the side which **hold** the relation.
+- The owning side has to have the inversedBy attribute of the OneToOne, ManyToOne, or ManyToMany mapping declaration.
+- The inversedBy attribute contains the name of the association-field on the inverse-side.
+- The owning side of a OneToOne association is the entity with the table containing **the foreign key**.
+ 
+
+#### Inverse Side
+- The inverse side has to have the mappedBy attribute of the OneToOne, OneToMany, or ManyToMany mapping declaration. The mappedBy attribute contains the name of the association-field on the owning side.
+
+
+
+
+

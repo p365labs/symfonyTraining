@@ -21,9 +21,10 @@ class AccountType extends AbstractType
                     Account::ACCOUNT_TYPE_BUSINESS,
                 ),
                 'expanded' => true,
+
             ))
             ->add('taxcode', TextType::class)
-            ->add('contact', ContactType::class)
+            ->add('contact', ContactType::class, array('by_reference' => false))
             ->add('Submit', SubmitType::class, array('label' => 'Create Account'))
         ;
     }

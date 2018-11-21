@@ -22,8 +22,17 @@
                     <td>{{ account.tax_code }}</td>
                     <td>{{ account.contact.name }}</td>
                     <td>{{ account.contact.surname }}</td>
-                    <td>{{ account.contact.address }}</td>
-                    <td>{{ account.contact.phone }}</td>
+                    {% for address in account.contact.addresses %}
+                        <td>{{ address.address }}</td>
+                        <td>{{ address.zip }}</td>
+                        <td>{{ address.country }}</td>
+                    {% else %}
+                        <td></td>
+                    {% endfor %}
+
+                    {% for phone in account.contact.phones %}
+                        <td>{{ phone.number }}</td>
+                    {% endfor %}
                 </tr>
             {% endfor %}
             </tbody>
